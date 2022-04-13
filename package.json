@@ -1,0 +1,19 @@
+{
+  "name": "food-bot",
+  "version": "1.0.0",
+  "description": "a discord bot for getting deliveries",
+  "main": "src/index.js",
+  "author": "sauhardo2020",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}
