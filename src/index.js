@@ -6,20 +6,23 @@ const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
-client.on('ready', (e) => {
-  console.log('bot is ready to login');
+//logging when ready
+client.on('ready', () => {
+  console.log('🤖🤖 Bot is ready to login');
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+//listening to messages and checking for food command
 client.on('messageCreate', async (message) => {
   if (message.content.includes('$sudo-get-food')) {
     const food_data = await GetFoodData();
 
-    food_data.recipes.forEach(({ title, image, summary }) => {
+    food_data.recipes.forEach((food) => {
       const embed = CreateEmbed({
-        title,
-        image,
-        summary,
+        title: food.title,
+        image: food.image,
+        summary: food.summary,
+        sourceUrl: food.spoonacularSourceUrl,
       });
 
       message.channel.send({ embeds: [embed] });
@@ -27,4 +30,5 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+//login using the DISCORD TOKEN
 client.login(process.env.DISCORD_TOKEN);
