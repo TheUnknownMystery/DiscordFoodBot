@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 
 const CreateEmbed = (message) => {
-  const Embedmessage = new MessageEmbed()
+  return new MessageEmbed()
     .setColor('#0099ff')
     .setTitle(message.title)
     .setURL(message.image)
