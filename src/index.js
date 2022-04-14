@@ -1,6 +1,6 @@
 const { Client, Intents } = require('discord.js');
 const CreateEmbed = require('./utils/embed');
-const GetFoodData = require('./utils/get-food-api');
+const { GetFoodData, GetFoodByName } = require('./utils/get-food-api');
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -18,15 +18,30 @@ client.on('messageCreate', async (message) => {
     const food_data = await GetFoodData();
 
     food_data.recipes.forEach((food) => {
-      const embed = CreateEmbed({
-        title: food.title,
-        image: food.image,
-        summary: food.summary,
-        sourceUrl: food.spoonacularSourceUrl,
-      });
+      const embed = CreateEmbed(food);
 
       message.channel.send({ embeds: [embed] });
     });
+  }
+
+  if (message.content.includes('$food-name=')) {
+    try {
+      const food_name = message.content.split('$food-name=')[1];
+      const food_data = await GetFoodByName(food_name);
+
+      food_data.results.forEach((food) => {
+        const embed = CreateEmbed({
+          title: food.title,
+          image: food.image,
+          summary: `showing results of ${food_name}`,
+          sourceUrl: food.image,
+        });
+
+        message.channel.send({ embeds: [embed] });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 });
 
