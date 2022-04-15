@@ -1,3 +1,4 @@
+const Filter = require('bad-words');
 const { Client, Intents } = require('discord.js');
 const CreateEmbed = require('./utils/embed');
 const { GetFoodData, GetFoodByName } = require('./utils/get-food-api');
@@ -14,12 +15,32 @@ client.on('ready', () => {
 
 //listening to messages and checking for food command
 client.on('messageCreate', async (message) => {
+  const filter = new Filter();
+
+  if (filter.isProfane(message.content) === true) {
+    message.delete();
+    message.channel.send(
+      `${message.author.username} you are not allowed to use that word`
+    );
+  }
+
+  if (message.content.startsWith('#list-users')) {
+    //get all users in discord server
+    const users = message.guild.members.cache.map((member) => member.user);
+    message.channel.send(`
+      users in this server:
+
+      ${users
+        .map((user) => `${user.bot ? '🤖' : '👳'}-${user.username}`)
+        .join('\n')}
+    `);
+  }
+
   if (message.content.includes('$sudo-get-food')) {
     const food_data = await GetFoodData();
 
     food_data.recipes.forEach((food) => {
       const embed = CreateEmbed(food);
-
       message.channel.send({ embeds: [embed] });
     });
   }
