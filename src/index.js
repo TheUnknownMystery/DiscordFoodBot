@@ -1,7 +1,9 @@
 const { GetFoodData, GetFoodByName } = require('./utils/get-food-api');
-const ImageSanity = require('./utils/innapropriate-api.js');
+const { createMailOptions, transporter } = require('./utils/email');
 const CreateEmbed = require('./utils/embed');
-const { Client, Intents } = require('discord.js');
+const ImageSanity = require('./utils/innapropriate-api.js');
+
+const { Client, Intents, Message } = require('discord.js');
 const Filter = require('bad-words');
 
 const client = new Client({
@@ -25,14 +27,26 @@ client.on('messageCreate', async (message) => {
 
     try {
       if (
-        weapon > 0.1 ||
+        weapon > 0.01 ||
         alcohol > 0.1 ||
         gore.prob > 0.1 ||
-        nudity.raw > 0.1 ||
-        nudity.safe >= 0.9
+        nudity.safe < 0.9
       ) {
         message.channel.send(
           `${message.author} Please do not post nudity or gore content.`
+        );
+
+        message.delete();
+
+        transporter.sendMail(
+          createMailOptions(
+            'Nudity or Gore picture was sent',
+            'Nudity or Gore picture was sent',
+            message.attachments.first().url
+          ),
+          (error) => {
+            if (error) console.log(error);
+          }
         );
       }
     } catch (error) {
@@ -44,6 +58,17 @@ client.on('messageCreate', async (message) => {
     message.delete();
     message.channel.send(
       `${message.author.username} you are not allowed to use that word.`
+    );
+
+    transporter.sendMail(
+      createMailOptions(
+        'Discord Message Deleted',
+        `${message.author.username} used a profane word.`,
+        `A bad word was sent "${message.content}" by ${message.author.username}`
+      ),
+      (error) => {
+        if (error) return console.log(error);
+      }
     );
   }
 
